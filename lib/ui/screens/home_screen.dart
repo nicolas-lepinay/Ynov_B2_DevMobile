@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:netflix_clone/models/movie.dart';
-import 'package:netflix_clone/services/api_service.dart';
+import 'package:netflix_clone/repositories/data_repository.dart';
 import 'package:netflix_clone/utils/constant.dart';
+import 'package:provider/provider.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -12,24 +12,21 @@ class HomeScreen extends StatefulWidget {
 }
 
 class _HomeScreenState extends State<HomeScreen> {
-  List<Movie>? movies;
-
   @override
   void initState() {
     super.initState();
     getMovies();
   }
 
-  void getMovies() {
-    ApiService().getPopularMovies(pageNumber: 1).then((movieList) {
-      setState(() {
-        movies = movieList;
-      });
-    });
+  void getMovies() async {
+    final dataProvider = Provider.of<DataRepository>(context);
+    await dataProvider.getPopularMovies();
   }
 
   @override
   Widget build(BuildContext context) {
+    final dataProvider = Provider.of<DataRepository>(context);
+
     return Scaffold(
       backgroundColor: kBackgroundColor,
       appBar: AppBar(
@@ -41,9 +38,12 @@ class _HomeScreenState extends State<HomeScreen> {
           Container(
             height: 500,
             //color: Colors.red,
-            child: movies == null || movies?[0].posterPath == null
+            child: dataProvider.popularMovieList.isEmpty
                 ? SizedBox()
-                : Image.network(movies![0].posterURL()!, fit: BoxFit.cover),
+                : Image.network(
+                    dataProvider.popularMovieList[0].posterURL()!,
+                    fit: BoxFit.cover,
+                  ),
           ),
           const SizedBox(height: 16),
           Text(
@@ -65,11 +65,11 @@ class _HomeScreenState extends State<HomeScreen> {
                   margin: const EdgeInsets.only(right: 8),
                   width: 110,
                   //color: Colors.yellow,
-                  child: movies == null
+                  child: dataProvider.popularMovieList.isEmpty
                       ? Center(child: Text(index.toString()))
-                      : movies?[index].posterPath != null
+                      : dataProvider.popularMovieList[index].posterPath != null
                       ? Image.network(
-                          movies![index].posterURL()!,
+                          dataProvider.popularMovieList[index].posterURL()!,
                           fit: BoxFit.cover,
                         )
                       : SizedBox(),
