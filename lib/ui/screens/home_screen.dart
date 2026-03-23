@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:netflix_clone/models/movie.dart';
+import 'package:netflix_clone/services/api_service.dart';
 import 'package:netflix_clone/utils/constant.dart';
 
 class HomeScreen extends StatefulWidget {
@@ -10,6 +12,22 @@ class HomeScreen extends StatefulWidget {
 }
 
 class _HomeScreenState extends State<HomeScreen> {
+  List<Movie>? movies;
+
+  @override
+  void initState() {
+    super.initState();
+    getMovies();
+  }
+
+  void getMovies() {
+    ApiService().getPopularMovies(pageNumber: 1).then((movieList) {
+      setState(() {
+        movies = movieList;
+      });
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -20,7 +38,13 @@ class _HomeScreenState extends State<HomeScreen> {
       ),
       body: ListView(
         children: [
-          Container(height: 500, color: Colors.red),
+          Container(
+            height: 500,
+            //color: Colors.red,
+            child: movies == null || movies?[0].posterPath == null
+                ? SizedBox()
+                : Image.network(movies![0].posterURL()!, fit: BoxFit.cover),
+          ),
           const SizedBox(height: 16),
           Text(
             'Tendance actuelle',
@@ -40,8 +64,15 @@ class _HomeScreenState extends State<HomeScreen> {
                 return Container(
                   margin: const EdgeInsets.only(right: 8),
                   width: 110,
-                  color: Colors.yellow,
-                  child: Center(child: Text(index.toString())),
+                  //color: Colors.yellow,
+                  child: movies == null
+                      ? Center(child: Text(index.toString()))
+                      : movies?[index].posterPath != null
+                      ? Image.network(
+                          movies![index].posterURL()!,
+                          fit: BoxFit.cover,
+                        )
+                      : SizedBox(),
                 );
               },
             ),
