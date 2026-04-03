@@ -17,9 +17,16 @@ class DataRepository with ChangeNotifier {
       );
       _popularMovieList.addAll(movies);
       _popularMovieIndex++;
+      notifyListeners();
     } on Response catch (response) {
       print("(!) ERROR: ${response.statusCode}");
       rethrow;
     }
+  }
+
+  // Lance toutes les fonctions "get..."
+  Future<void> initData() async {
+    await getPopularMovies();
+    // ...
   }
 }
