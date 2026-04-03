@@ -9,16 +9,19 @@ class DataRepository with ChangeNotifier {
   final List<Movie> _popularMovieList = [];
   final List<Movie> _nowPlayingMovieList = [];
   final List<Movie> _upcomingMovieList = [];
+  final List<Movie> _animationMovieList = [];
 
   // Page indexes
   int _popularMovieIndex = 1;
   int _nowPlayingMovieIndex = 1;
   int _upcomingMovieIndex = 1;
+  int _animationMovieIndex = 1;
 
   // Getters
   List<Movie> get popularMovieList => _popularMovieList;
   List<Movie> get nowPlayingMovieList => _nowPlayingMovieList;
   List<Movie> get upcomingMovieList => _upcomingMovieList;
+  List<Movie> get animationMovieList => _animationMovieList;
 
   Future<void> getPopularMovies() async {
     try {
@@ -62,11 +65,27 @@ class DataRepository with ChangeNotifier {
     }
   }
 
-  // Lance toutes les fonctions "get..."
+  Future<void> getAnimationMovies() async {
+    try {
+      List<Movie> movies = await apiService.getAnimationMovies(
+        pageNumber: _animationMovieIndex,
+      );
+      _animationMovieList.addAll(movies);
+      _animationMovieIndex++;
+      notifyListeners();
+    } on Response catch (response) {
+      print("(!) ERROR: ${response.statusCode}");
+      rethrow;
+    }
+  }
+
+  // Lance toutes les fonctions "get..." en parallèle
   Future<void> initData() async {
-    await getPopularMovies();
-    await getNowPlayingMovies();
-    await getUpcomingMovies();
-    // ...
+    await Future.wait([
+      getPopularMovies(),
+      getNowPlayingMovies(),
+      getUpcomingMovies(),
+      getAnimationMovies(),
+    ]);
   }
 }

@@ -64,6 +64,16 @@ class _HomeScreenState extends State<HomeScreen> {
             imageHeight: 160,
             callback: dataProvider.getUpcomingMovies,
           ),
+
+          const SizedBox(height: 24),
+
+          MovieCategory(
+            label: "Films d'animation",
+            movieList: dataProvider.animationMovieList,
+            imageWidth: 220,
+            imageHeight: 320,
+            callback: dataProvider.getAnimationMovies,
+          ),
         ],
       ),
     );
