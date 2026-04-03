@@ -30,37 +30,39 @@ class _HomeScreenState extends State<HomeScreen> {
       ),
       body: ListView(
         children: [
-          Container(
+          SizedBox(
             height: 500,
-            //color: Colors.red,
-            child: dataProvider.popularMovieList.isEmpty
+            child: dataProvider.nowPlayingMovieList.isEmpty
                 ? SizedBox()
-                : MovieCard(movie: dataProvider.popularMovieList.first),
+                : MovieCard(movie: dataProvider.nowPlayingMovieList.first),
           ),
 
           MovieCategory(
-            label: "Tendances actuelles",
+            label: "Les mieux notés",
             movieList: dataProvider.popularMovieList,
             imageWidth: 110,
             imageHeight: 160,
+            callback: dataProvider.getPopularMovies,
           ),
 
           const SizedBox(height: 24),
 
           MovieCategory(
             label: "Actuellement au cinéma",
-            movieList: dataProvider.popularMovieList,
+            movieList: dataProvider.nowPlayingMovieList,
             imageWidth: 220,
             imageHeight: 320,
+            callback: dataProvider.getNowPlayingMovies,
           ),
 
           const SizedBox(height: 24),
 
           MovieCategory(
             label: "Bientôt disponibles",
-            movieList: dataProvider.popularMovieList,
+            movieList: dataProvider.upcomingMovieList,
             imageWidth: 110,
             imageHeight: 160,
+            callback: dataProvider.getUpcomingMovies,
           ),
         ],
       ),

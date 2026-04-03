@@ -9,6 +9,7 @@ class MovieCategory extends StatelessWidget {
   final List<Movie> movieList;
   final double imageHeight;
   final double imageWidth;
+  final Function callback;
 
   const MovieCategory({
     super.key,
@@ -16,6 +17,7 @@ class MovieCategory extends StatelessWidget {
     required this.movieList,
     required this.imageWidth,
     required this.imageHeight,
+    required this.callback,
   });
 
   @override
@@ -35,21 +37,30 @@ class MovieCategory extends StatelessWidget {
         const SizedBox(height: 10),
         SizedBox(
           height: imageHeight,
-          child: ListView.builder(
-            scrollDirection: Axis.horizontal,
-            itemCount: 10,
-            itemBuilder: (BuildContext context, int index) {
-              return Container(
-                margin: const EdgeInsets.only(right: 8),
-                width: imageWidth,
-                //color: Colors.yellow,
-                child: movieList.isEmpty
-                    ? Center(child: Text(index.toString()))
-                    : movieList[index].posterPath != null
-                    ? MovieCard(movie: movieList[index])
-                    : SizedBox(),
-              );
+          child: NotificationListener<ScrollNotification>(
+            onNotification: (ScrollNotification notification) {
+              final currentPosition = notification.metrics.pixels;
+              final maxPosition = notification.metrics.maxScrollExtent;
+              if (currentPosition > maxPosition / 2) {
+                callback();
+              }
+              return true;
             },
+            child: ListView.builder(
+              scrollDirection: Axis.horizontal,
+              itemCount: movieList.length,
+              itemBuilder: (BuildContext context, int index) {
+                return Container(
+                  margin: const EdgeInsets.only(right: 8),
+                  width: imageWidth,
+                  child: movieList.isEmpty
+                      ? Center(child: Text(index.toString()))
+                      : movieList[index].posterPath != null
+                      ? MovieCard(movie: movieList[index])
+                      : SizedBox(),
+                );
+              },
+            ),
           ),
         ),
       ],

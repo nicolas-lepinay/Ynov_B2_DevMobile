@@ -28,18 +28,47 @@ class ApiService {
 
   Future<List<Movie>> getPopularMovies({required int pageNumber}) async {
     Response response = await getData(
-      '/movie/popular',
+      '/movie/top_rated',
+      //'/movie/popular',
       params: {'page': pageNumber},
     );
     if (response.statusCode == 200) {
       Map data = response.data;
-      List<dynamic> results = data['results'];
-      List<Movie> movies = [];
+      List<Movie> movies = data['results'].map<Movie>((dynamic movieJson) {
+        return Movie.fromJson(movieJson);
+      }).toList();
+      return movies;
+    } else {
+      throw response;
+    }
+  }
 
-      for (Map<String, dynamic> json in results) {
-        Movie movie = Movie.fromJson(json);
-        movies.add(movie);
-      }
+  Future<List<Movie>> getNowPlayingMovies({required int pageNumber}) async {
+    Response response = await getData(
+      '/movie/now_playing',
+      params: {'page': pageNumber},
+    );
+    if (response.statusCode == 200) {
+      Map data = response.data;
+      List<Movie> movies = data['results'].map<Movie>((dynamic movieJson) {
+        return Movie.fromJson(movieJson);
+      }).toList();
+      return movies;
+    } else {
+      throw response;
+    }
+  }
+
+  Future<List<Movie>> getUpcomingMovies({required int pageNumber}) async {
+    Response response = await getData(
+      '/movie/upcoming',
+      params: {'page': pageNumber},
+    );
+    if (response.statusCode == 200) {
+      Map data = response.data;
+      List<Movie> movies = data['results'].map<Movie>((dynamic movieJson) {
+        return Movie.fromJson(movieJson);
+      }).toList();
       return movies;
     } else {
       throw response;
